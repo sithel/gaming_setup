@@ -24,7 +24,7 @@ During the day the fanatics preach to the flock. They can shout soapbox style. T
 
 At the end of the day (or througuth) the flock can pray, donate, convert, etc to a Deity. Only Deities they've been preached about are valid.
 
-Once the day is done one fanatic player transitions to a flock player and one flock player is elevated to be a fanatic. This way people are cycled between their "primary" character and an NPC. On every day boundry a flock player can optionally "generate" a new flock character or continue playing a previous one. When a flock player transitions to their fanatic role their flock character ends. There is no returning to a discarded/ended flock character.
+Once the day is done one fanatic player transitions to a flock player and one flock player is elevated to be a fanatic. This way people are cycled between their "primary" character and an NPC. On every day boundry a flock player can optionally "generate" a new flock character or continue that day's member. When a flock player transitions to their fanatic role their flock character ends. There is no returning to a discarded/ended flock character.
 
 ## Goal
 
