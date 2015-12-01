@@ -1,0 +1,111 @@
+\documentclass{book}
+\usepackage[letterpaper, margin=0.5in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{pifont}
+\newcommand*{\field}[2][]{%
+    \noindent\makebox[\linewidth]{#1%
+    \textbf{#2}
+    \leaders\hrule height \dimexpr-.5ex+.2pt\relax depth \dimexpr .6ex+.2pt\relax \hfill\kern0pt% Right rule
+    }
+}
+\newcommand*{\jumpHeadline}[2][]{%
+    \noindent\makebox[\linewidth]{#1%
+    \leaders\hrule height \dimexpr1.5ex+0pt\relax depth \dimexpr -.5ex+1pt\relax \hfill% Left rule
+    {\MakeUppercase {\large \textbf{#2}}}
+    }
+}
+
+\newcommand*{\cutline}[1][]{%
+  \noindent\dotfill\raisebox{-0.25\baselineskip}{\ding{34}}\dotfill\dotfill
+}
+\newcommand*{\flock}[2][]{%
+  \field{Faith: $\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ Money  \_ Available offering}
+  \field{#2Plight}
+  \field{}
+}
+
+\begin{document}
+\pagenumbering{gobble}
+\jumpHeadline{Faith}
+\field{Deity name}
+\field{ domain}
+\field{ religious symbol}
+\field{ description}
+\field{}
+\field{Fanatic name}
+\field{  source of faith}
+\field{  description}
+\field{}
+\field{Feat [10 faith]}
+\field{Feat [50 faith]}
+\field{Feat [100 faith]}
+\textbf{Faith acquired}\\
+\texttt{ 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ |
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$\\ 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ |
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$\\ 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ |
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$\\ 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ |
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$\\ 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ |
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$ | 
+$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$$\bigcirc$\\ }
+
+\jumpHeadline{Day}
+When cutting, keep the Event \& Day Specific Flock member together. Once the Event has been selected for that day, cut the Day Specific Flock member off and shuffle it in with the necessary number of ordinary Flock members. 
+
+\cutline{}
+\field{Event}
+\cutline{}
+\flock{Day Specific }
+
+\cutline{}
+\field{Event}
+\cutline{}
+\flock{Day Specific }
+
+\cutline{}
+
+\jumpHeadline{Flock}
+\cutline{}
+\flock{}
+\cutline{}
+\flock{}
+\cutline{}
+\flock{}
+\cutline{}
+\flock{}
+\cutline{}
+\flock{}
+\end{document}

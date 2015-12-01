@@ -22,7 +22,7 @@ Each day there is a theme or recent event randomly generated. Ex: a home burned 
 
 During the day the fanatics preach to the flock. They can shout soapbox style. They can council 1:1. Possibly they can perform feats to aid a member of the flock [see: Bonus Digital Content]
 
-At the end of the day (or througuth) the flock can pray, donate, convert, etc to a Deity. Only Deities they've been preached about are valid.
+At the end of the day (and througuth) the flock can pray, donate, convert, etc to a Deity. Only Deities they've been preached about are valid.
 
 Once the day is done one fanatic player transitions to a flock player and one flock player is elevated to be a fanatic. This way people are cycled between their "primary" character and an NPC. On every day boundry a flock player can optionally "generate" a new flock character or continue that day's member. When a flock player transitions to their fanatic role their flock character ends. There is no returning to a discarded/ended flock character.
 
@@ -49,7 +49,7 @@ Given players: *1 2 3 4 5 6*
 |6 4 |1 2 3 5   | 11|
 |4 1 | 2 3 5 6  | 12|
 
-Every player gets 4 rounds as their fanatic- everyone but player 1 gets them in 2 blocks. Every player gets to interact with 4 of the other players (leaving 1 player they never interact with). The average flock member can live up to 4 days. Given 10 minutes for a day and 3 minutes for "night time" transition/accounting, that puts the game at 156 minutes (2.5 hours) leaving plenty of time for further rounds.
+Every player gets 4 rounds as their fanatic- everyone but player 1 gets them in 2 blocks. Every fanatic gets to interact with 4 of the other fanatics (leaving 1 fanatic they never interact with). The average flock member can live up to 4 days. Given 10 minutes for a day and 3 minutes for "night time" transition/accounting, that puts the game at 156 minutes (2.5 hours) leaving plenty of time for further rounds.
 
 Keeping everything IG during the day and keeping transitions brief (settle your faith debt, occasionally generate a new flock member, mentally prepping for day's event) should keep the game snappy and moving forward.
 
