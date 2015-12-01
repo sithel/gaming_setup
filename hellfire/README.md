@@ -1,6 +1,6 @@
 #Hellfire
 
-I'ts the debate team, meets improve, meets religious fanatics.
+It's the debate team, meets improve, meets religious fanatics.
 
 ## Pre-Game
 
@@ -36,11 +36,13 @@ Because Rebecca can't think of entirely pen & paper games. Digital content makes
 
 ### Day Event Generation
 
-A single person can come up with all events, but it'd be nice if part of the pre-game process people suggested ideas for what day events could be. They could also suggest event ideas that are relevant to their Deity and a delicious semi-randomized function could try to ensure that these events happen before/during/shortly after a particular fanatic's run.
+A single person can come up with all events, but it'd be nice if part of the pre-game process people suggested ideas for what day events could be. They could also suggest event ideas that are relevant to their Deity and a delicious semi-randomized function could try to ensure that these events happen shortly before/during/shortly after a particular fanatic's run.
 
 ### Flock Generation
 
 Obviously it can be left up to the players to come up with a handful of interesting flock members. It can also help if they're digitally assisted with a 1 sentance prompt on a possible driving motive. This would mean that when they're listening to the fanatics they're trying to get a specific answer/response/resolution from them. Which also means fanatics have to tailor their message to that day's flock. 
+
+It would also help if any of that day's newly generated flock members had a prompt related to the day's event.
 
 Randomized resource generation would also be a win. This could be done with just a dice roll but phffff! Things a flock member might have to distribute amongst the fanatics:
 
@@ -49,7 +51,7 @@ Randomized resource generation would also be a win. This could be done with just
 - lands
 - wordly goods- from jewels to cows. Incorporating a fun noun dictionary here could provide good comedic prompts to work from.
 
-Every flock member will at least start with the same amount of "faith" that they can chose to deticate. This can be spread amongst several days and Deities or dumped in one go. It must be dumped entirely before that flock member is ended (either throughut the day(s) or just as the character is ending, possibly "at night")
+Every flock member will at least start with the same amount of "faith" that they can chose to deticate. This can be spread amongst several days and Deities or dumped in one go. It must be dumped entirely before that flock member is ended (either throught the day(s) or just as the character is ending, possibly "at night")
 
 ### Fanatics' Feats
 
