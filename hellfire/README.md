@@ -30,32 +30,33 @@ Once the day is done one fanatic player transitions to a flock player and one fl
 
 Obviously the goal of the game would just be to have fun/play silly roles. But it's also to see who can get the most converts/funds/etc.
 
-## Bonus Digital Content
-
-Because Rebecca can't think of entirely pen & paper games. Digital content makes everything better. Sweet sweet semi-randomized content & digital stats tracking.
-
-### Example
+## Example Game
 
 Given players: *1 2 3 4 5 6*
 
 | Fanatics | Flock | Round |
 | -------- | ----- | ----- |
-| 12 | 3456 |  1|
-|23 | 4561 |  2|
-|34 | 5612 |  3|
-|45 | 6123 |    4|
-|56 | 1234 |  5|
-|61 | 2345 |  6|
-|13 | 2456 |  7|
-|35 | 1246 |  8|
-|52 | 1346 |  9|
-|26 | 1345 |  10|
-|64 |1235   | 11|
-|41 | 2356  | 12|
+| 1 2 | 3 4 5 6 |  1|
+|2 3 | 4 5 6 1 |  2|
+|3 4 | 5 6 1 2 |  3|
+|4 5 | 6 1 2 3 |    4|
+|5 6 | 1 2 3 4 |  5|
+|6 1 | 2 3 4 5 |  6|
+|1 3 | 2 4 5 6 |  7|
+|3 5 | 1 2 4 6 |  8|
+|5 2 | 1 3 4 6 |  9|
+|2 6 | 1 3 4 5 |  10|
+|6 4 |1 2 3 5   | 11|
+|4 1 | 2 3 5 6  | 12|
 
 Every player gets 4 rounds as their fanatic- everyone but player 1 gets them in 2 blocks. Every player gets to interact with 4 of the other players (leaving 1 player they never interact with). The longest a single flock member can live for is 4 days. Given 10 minutes for a day and 3 minutes for "night time" transition/accounting, that puts the game at 156 minutes (2.5 hours) leaving plenty of time for further rounds.
 
 Keeping everything IG during the day and keeping transitions brief (settle your faith debt, occasionally generate a new flock member, mentally prepping for day's event) should keep the game snappy and moving forward.
+
+## Bonus Digital Content
+
+Because Rebecca can't think of entirely pen & paper games. Digital content makes everything better. Sweet sweet semi-randomized content & digital stats tracking.
+
 
 ### Day Event Generation
 
