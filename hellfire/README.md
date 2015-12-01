@@ -1,6 +1,6 @@
 #Hellfire
 
-It's the debate team, meets improve, meets religious fanatics.
+It's the debate team, meets improve, meets religious fanatics, meets speed dating.
 
 ## Pre-Game
 
@@ -91,3 +91,22 @@ Covet everything, including information! While this does not enforce a digital s
 
 The flock-to-fanatic conversion should be fair but not a fixed order. Perhaps done Pandemic style (each round is "fair" but internally randomized)
 
+## Non-Digital Approach
+
+Okay, so, maybe not everything should be digital... thinking about it more (and reminiscing about the delight that was [Beatrice Henrietta Bristol-Smythe, DBE, &c.](http://www.tao-games.com/being-a-role-playing-game-on-the-topic-of-the-high-flying-adventures-of-beatrice-henrietta-bristol-smythe-dbe-daring-aviatrix-and-accomplished-exploratrix-and-her-gentleman-companion-who-for/)) this could acutally be done rather easily with a fun printable PDF and a pair or two of scissors.
+
+Everyone prints & fills out one of the [provided forms](hellfire_form.pdf). The Events are cut up and shuffled. The Flock are cut up and shuffled. For each day an Event is selected. The Event Specific Flock member + remaining required number of new Flock Members are selected, shuffled together, and doled out as need. A d100 is rolled to determine how much money a Flock member starts with. Faith spent/gained are bubbled in. Use the back of the sheet to track funds & offerings in posession of a fanatic.
+
+## Questions (to soon to be F.A.Q)
+
+> At the beginning of each day, are all the flock godless? Or does it carry over from day to day and the new fanatics must win the flock members from the Deity they pledged to before (giving the carry-over fanatic a bit of the incumbent's edge)?
+
+Newly generated flock members are godless. The degree to which a flock member remains faithful to yesterday's Deity is up to the player. Yes, starting fanatics do get an edge. But every round there is guarenteed to be at least one new flock member, if not more.
+
+> "Deities they have been preached about" is just preached on that day, not "preached about ever"
+
+A flock member must have met the fanatic of a Deity in order to be faithful to that Deity. It is encouraged (but not required?) that that Deity's fanatic be currently present.
+
+> What happens when neither fanatic is convincing?  Do they pick by random lot or is there the option of "godless heathens"?
+
+In order to be "fair", there is no aethiest option. A flock member need not spend faith on a particular day, but it must all be spent by the time they end, and it can only be spent on a Deity whose fanatic they met.
