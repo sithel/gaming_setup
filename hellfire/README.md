@@ -34,6 +34,29 @@ Obviously the goal of the game would just be to have fun/play silly roles. But i
 
 Because Rebecca can't think of entirely pen & paper games. Digital content makes everything better. Sweet sweet semi-randomized content & digital stats tracking.
 
+### Example
+
+Given players: *1 2 3 4 5 6*
+
+| Fanatics | Flock | Round |
+| -------- | ----- | ----- |
+| 12 | 3456 |  1|
+|23 | 4561 |  2|
+|34 | 5612 |  3|
+|45 | 6123 |    4|
+|56 | 1234 |  5|
+|61 | 2345 |  6|
+|13 | 2456 |  7|
+|35 | 1246 |  8|
+|52 | 1346 |  9|
+|26 | 1345 |  10|
+|64 |1235   | 11|
+|41 | 2356  | 12|
+
+Every player gets 4 rounds as their fanatic- everyone but player 1 gets them in 2 blocks. Every player gets to interact with 4 of the other players (leaving 1 player they never interact with). The longest a single flock member can live for is 4 days. Given 10 minutes for a day and 3 minutes for "night time" transition/accounting, that puts the game at 156 minutes (2.5 hours) leaving plenty of time for further rounds.
+
+Keeping everything IG during the day and keeping transitions brief (settle your faith debt, occasionally generate a new flock member, mentally prepping for day's event) should keep the game snappy and moving forward.
+
 ### Day Event Generation
 
 A single person can come up with all events, but it'd be nice if part of the pre-game process people suggested ideas for what day events could be. They could also suggest event ideas that are relevant to their Deity and a delicious semi-randomized function could try to ensure that these events happen shortly before/during/shortly after a particular fanatic's run.
