@@ -1,2 +1,2 @@
 # gaming_setup
-tools to enhance running a tabletop game
+Things I might need to run a game. Because computers.
