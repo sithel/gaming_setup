@@ -7,7 +7,7 @@ from model import connect_to_db, db, Light
 from flask import Flask, render_template, redirect, url_for, request, session, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 
-import urllib2
+import httplib
 
 # This is how Flask knows what module to scan for things like routes
 app = Flask(__name__)
@@ -25,11 +25,23 @@ def process_tag(tag_id):
     print "TAG ID: ", tag_id 
     entry = Light.query.filter_by(tag_id = tag_id).first()
 
-    opener = urllib2.build_opener(urllib2.HTTPHandler)
-    request = urllib2.Request('http://')
+    connection =  httplib.HTTPConnection('192.168.42.145')
+    body_content = "{\"xy\":[%s, %s],\"bri\":%s}"%(entry.x, entry.y, entry.brightness)
+    connection.request('PUT', '/api/72cd81fd5883034715a912fd1439a7fb/lights/4/state', body_content)
+    result = connection.getresponse()
+    # Now result.status and result.reas
+    print "BODY CONTENT: ", body_content
+    print "RESULT: ", result
+    print "RESULT: ", result.status
+    print "RESULT: ", result.msg
+    print "RESULT: ", result.read()
+
 
     print "ENTRY: ", entry
+
+
     return "Rebecca makes amazing monsters"
+
 
 
 @app.route('/')
