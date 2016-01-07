@@ -15,29 +15,43 @@
 
 var orbits = [];
 var colors = [0x00bfff, 0x00bfff, 0xff8000, 0xff8000, 0xff00ff, 0xff00ff];
+var UNITS_PER_30_MIN = 10;
+var UNIT_PER_FRAME = 0.01;
+
 function generateOrbit(num, freq, offset, distance, appraoch, scene) {
   var material = new THREE.MeshBasicMaterial({wireframe: true, color: colors[num-1], specular: 0x555555, shininess: 30, opacity: 0.5, transparent: true});
-  var radius = distance;
-  var segments = 60;
-
-  var circleGeometry = new THREE.CircleGeometry( radius, segments );
-  var cylinder = new THREE.Mesh( circleGeometry, material );
+  var radius = distance;  // did Sarah give radius or diameter? 
+  
+  var circleGeometry = new THREE.CircleGeometry( radius, 60);
+  var orbit = new THREE.Mesh( circleGeometry, material );
   // var cylinderGeometry = new THREE.CylinderGeometry( radius, radius, 0.2, 32 );
-  // var cylinder = new THREE.Mesh( cylinderGeometry, material );
+  // var orbit = new THREE.Mesh( cylinderGeometry, material );
+  scene.add(orbit);
 
-  var geometry = new THREE.SphereGeometry( 0.1, 32, 32 );
-  var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
-  var sphere = new THREE.Mesh( geometry, material );
+  var circumference = 2 * Math.PI * radius;
+  // TODO : solve for rotation per animation frame in radians
+  var rotationSpeed = Math.random() / 10;
+  // TODO : solve for # of ships based on circumference and frequency
+  var num = Math.round(Math.random() * 7) + 2;
+  // TODO : factor in offset into here somehow
 
-  scene.add(sphere);
-  scene.add(cylinder);
+  var spheres = [];
+  var geometry = new THREE.SphereGeometry( 1, 32, 32 );
+  var material = new THREE.MeshBasicMaterial( {color: 0xffff00, specular: 0x555555, shininess: 30, opacity: 0.8, transparent: true} );
+  for (var i = 0; i < num; ++i) {
+    var sphere = new THREE.Mesh( geometry, material );
+    scene.add(sphere);
+    spheres.push(sphere);
+  }
 
   orbits.push({
-    obj: cylinder,
-    s: sphere,
-    dist: distance,
-    rot: Math.random() * Math.PI * 2,
-    srot: 6,
+    orbit: orbit,
+    spheres: spheres,
+    rotationSpeed: rotationSpeed,
+    radius: distance,
+    // TODO : get the actual angles based off the sketch
+    orbitRotation: Math.random() * Math.PI * 2,
+    shipRotation: 0,
   });
 }
 
@@ -71,17 +85,30 @@ scene.add( directionalLight );
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
+
+
+var orbit_rotation_vector = new THREE.Vector3(0,1,0);
+var ship_rotation_vector = new THREE.Vector3(0,0,1);
 function render() {
+    //   orbit: orbit,
+    // spheres: spheres,
+    // rotationSpeed: rotationSpeed,
+    // radius: distance,
+    // orbitRotation: Math.random() * Math.PI * 2,
+    // shipRotation: 0,
   for(var i = 0; i < orbits.length; ++i) {
-    var rr = orbits[i].obj;
-    var s = orbits[i].s;
-    rr.matrix.makeRotationAxis(new THREE.Vector3(0,1,0), orbits[i].rot)
-    orbits[i].srot += 0.01;
-    var vect = new THREE.Vector3(0, orbits[i].dist, 0).applyAxisAngle(new THREE.Vector3(0, 0, 1), orbits[i].srot);
-    vect.applyAxisAngle(new THREE.Vector3(0,1,0), orbits[i].rot);
-    s.matrix.setPosition(vect);
-    s.matrixAutoUpdate = false;
-    rr.matrixAutoUpdate = false;
+    var o = orbits[i];
+
+    o.orbit.matrix.makeRotationAxis(orbit_rotation_vector, o.orbitRotation);
+    o.orbit.matrixAutoUpdate = false;
+    o.shipRotation += o.rotationSpeed;
+    for(var j = 0; j < o.spheres.length; ++j) {
+      var s = o.spheres[j];
+      var shipVector = new THREE.Vector3(0, o.radius, 0).applyAxisAngle(ship_rotation_vector, o.shipRotation);  // spin the ships around the ring
+      shipVector.applyAxisAngle(orbit_rotation_vector, o.orbitRotation);  // twist the ring of ships to match the orbit
+      s.matrix.setPosition(shipVector);
+      s.matrixAutoUpdate = false;
+    }
   }
   requestAnimationFrame( render );
   renderer.render( scene, camera );
