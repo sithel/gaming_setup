@@ -9,20 +9,32 @@
     </style>
   </head>
   <body>
+    <div style="
+    position: absolute;
+    z-index: 100;
+    color: white;
+    font-family: monospace;
+    padding: 10px;
+    ">
+w : toggle orbit display <br>
+i/k : alter angle <br>
+a/z : alter x<br>
+s/x : alter y<br>
+d/c : alter z<br>
+</div>
     <script src="three.min.js"></script>
     <script src="orbitControls.js"></script>
     <script>
 
 var orbits = [];
-var colors = [0xff0000, 0xffbf00, 0x80ff00, 0x00ffbf, 0xff00ff, 0xff00ff];
+var colors = [0xff0000, 0xffbf00, 0x80ff00, 0x00ffbf, 0x0000ff, 0xff00ff];
 var UNITS_PER_30_MIN = 10;
 var UNIT_PER_FRAME = 0.01;
 
-function generateOrbit(num, freq, offset, distance, appraoch, scene) {
+function generateOrbit(num, freq, offset, radius, appraoch, scene) {
   var material = new THREE.MeshBasicMaterial({wireframe: true, color: colors[num-1], specular: 0x555555, shininess: 30, opacity: 0.3, transparent: true});
-  var radius = distance;  // did Sarah give radius or diameter? 
-  
-  var circleGeometry = new THREE.CircleGeometry( radius, 60);
+  window.rebMat = material;
+  var circleGeometry = new THREE.RingGeometry( radius - 0.1, radius + 0.1, 60 );//new THREE.CircleGeometry( radius, 60);
   var orbit = new THREE.Mesh( circleGeometry, material );
   // var cylinderGeometry = new THREE.CylinderGeometry( radius, radius, 0.2, 32 );
   // var orbit = new THREE.Mesh( cylinderGeometry, material );
@@ -32,13 +44,15 @@ function generateOrbit(num, freq, offset, distance, appraoch, scene) {
   // arc length = center angle in radians * radius
   var shipRotationRadians = UNITS_PER_30_MIN / radius;
   // TODO : solve for # of ships based on circumference and frequency
-  var num = Math.round(Math.random() * 7) + 2;
+  var count = Math.round(Math.random() * 7) + 2;
   // TODO : factor in offset into here somehow
 
   var spheres = [];
-  var geometry = new THREE.SphereGeometry( 1, 32, 32 );
-  var material = new THREE.MeshBasicMaterial( {color: colors[num-1], specular: 0x555555, shininess: 30, opacity: 0.8, transparent: true} );
-  for (var i = 0; i < num; ++i) {
+  var geometry = new THREE.SphereGeometry( 0.5, 32, 32 );
+  var material = new THREE.MeshPhongMaterial({
+    color: colors[num-1], specular: 0x555555, shininess: 30
+  } );
+  for (var i = 0; i < count; ++i) {
     var sphere = new THREE.Mesh( geometry, material );
     scene.add(sphere);
     spheres.push(sphere);
@@ -48,15 +62,44 @@ function generateOrbit(num, freq, offset, distance, appraoch, scene) {
     orbit: orbit,
     spheres: spheres,
     shipRotationRadians: shipRotationRadians,
-    radius: distance,
+    radius: radius,
     // TODO : get the actual angles based off the sketch
     orbitRotation: Math.random() * Math.PI * 2,
     shipRotation: 0,
   });
 }
 
+var corvo = null;
+function generatePath(scene) {
+  var pathLength = 40;
+  var path = new THREE.Mesh( new THREE.CylinderGeometry( 0.05, 0.05, pathLength, 32 ), new THREE.MeshBasicMaterial( {color: 0xffffff} ) );
+  scene.add( path );
+  var shipMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0x555555, shininess: 30} );
+  var ship = new THREE.Mesh( new THREE.SphereGeometry( 0.5, 32, 32 ), shipMaterial );
+  scene.add( ship );
+  // TODO : calc correct rate
+  var rate = 0.01;
+  corvo = {
+    path: path,
+    ship: ship,
+    position: 10,
+    rate: rate,
+    rotation: 2,
+    approach: new THREE.Vector3(1,0,1),
+  }
+}
+
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+camera.position.z = 40;
+
+var dirLight = new THREE.DirectionalLight(0xffffff, 1);
+dirLight.position.set(100, 100, 50);
+scene.add(dirLight);
+
+var light = new THREE.AmbientLight( 0x222222 ); // soft white light
+scene.add( light );
 
 
 generateOrbit(1, 3, 1, 1.5, 12, scene);
@@ -66,25 +109,8 @@ generateOrbit(4, 10, 0, 8, 9, scene);
 generateOrbit(5, 12, 0, 10, 7, scene);
 generateOrbit(6, 15, 0, 15, 2, scene);
 
-camera.position.z = 10;
+generatePath(scene);
 
-var dirLight = new THREE.DirectionalLight(0xffffff, 1);
-dirLight.position.set(100, 100, 50);
-scene.add(dirLight);
-
-var bluePoint = new THREE.PointLight(0x0033ff, 3, 150);
-bluePoint.position.set( 70, 5, 70 );
-scene.add(bluePoint);
-scene.add(new THREE.PointLightHelper(bluePoint, 3));
-
-var greenPoint = new THREE.PointLight(0x33ff00, 1, 150);
-greenPoint.position.set( -70, 5, 70 );
-scene.add(greenPoint);
-scene.add(new THREE.PointLightHelper(greenPoint, 3));
-
-var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-directionalLight.position.set( 0, 1, 0 );
-scene.add( directionalLight );
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
@@ -93,12 +119,19 @@ document.body.appendChild( renderer.domElement );
 var orbit_rotation_vector = new THREE.Vector3(0,1,0);
 var ship_rotation_vector = new THREE.Vector3(0,0,1);
 function render() {
-    //   orbit: orbit,
-    // spheres: spheres,
-    // shipRotationRadians: shipRotationRadians,
-    // radius: distance,
-    // orbitRotation: Math.random() * Math.PI * 2,
-    // shipRotation: 0,
+  corvo.approach.x += view_state.mod_x;
+  corvo.approach.y += view_state.mod_y;
+  corvo.approach.z += view_state.mod_z;
+  corvo.rotation += view_state.mod_r;
+  corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
+  corvo.position += 0.01;
+  // TODO : make this shit work
+  // var shipVector = new THREE.Vector3(0, corvo.position, 0).applyAxisAngle(corvo.approach, corvo.rotation);
+  // shipVector.applyAxisAngle(corvo.approach, corvo.rotation);
+  // corvo.ship.matrix.setPosition(shipVector);
+  corvo.ship.matrixAutoUpdate = false;
+  corvo.path.matrixAutoUpdate = false;
+
   for(var i = 0; i < orbits.length; ++i) {
     var o = orbits[i];
 
@@ -118,9 +151,74 @@ function render() {
   requestAnimationFrame( render );
   renderer.render( scene, camera );
 }
-render();
 controls = new THREE.OrbitControls( camera, renderer.domElement );
 
+
+var view_state = {
+  orbits: 0,    // 0 = wireframe, 1 = disks, 2 = nothing
+  mod_x: 0,
+  mod_r: 0,
+  mod_y: 0,
+  mod_z: 0,
+}
+window.onkeydown = function(e) {
+  var key = e.keyCode ? e.keyCode : e.which;
+  console.log(key);
+  if (key == 87) {
+    // cycle through wireframe-ness
+    view_state.orbits = (view_state.orbits + 1) % 3
+    console.log("orbits is now ",view_state.orbits)
+    for(var i = 0; i < orbits.length; ++i){
+      if (view_state.orbits == 0) {
+        console.log("setting oribits to wireframe");
+        // orbits[i].orbit.material.wireframeLinewidth = 2;
+        orbits[i].orbit.material.wireframe = true;
+        scene.add(orbits[i].orbit);
+        orbits[i].orbit.material.side = THREE.FrontSide;
+      } else if (view_state.orbits == 1) {
+        console.log("setting oribits to flat disks");
+        orbits[i].orbit.material.wireframe = false;
+        orbits[i].orbit.material.side = THREE.DoubleSide;
+      } else {
+        console.log("setting oribits to none");
+        scene.remove(orbits[i].orbit);
+        
+      }
+    }
+  } else if (key == 73) { // i
+    view_state.mod_r = 0.01
+  } else if (key == 75) { // k
+    view_state.mod_r = 0.01
+  } else if (key == 65) { // a
+    view_state.mod_x = 0.01
+  } else if (key == 90) { // z
+    view_state.mod_x = -0.01
+  } else if (key == 83) { // s
+    view_state.mod_y = 0.01
+  } else if (key == 88) { // x
+    view_state.mod_y = -0.01
+  } else if (key == 68) { // d
+    view_state.mod_z = 0.01
+  } else if (key == 67) { // c
+    view_state.mod_z = -0.01
+  }
+}
+
+window.onkeyup = function(e) {
+  var key = e.keyCode ? e.keyCode : e.which;
+  if (key == 65 || key == 90) {
+    view_state.mod_x = 0;
+  } else if(key == 73 || key == 75) {
+    view_state.mod_r = 0;
+  } else if(key == 83 || key == 88) {
+    view_state.mod_y = 0;
+  } else if(key == 67 || key == 68) {
+    view_state.mod_z = 0;
+  }
+}
+
+
+render();
     </script>
   </body>
 </html>
