@@ -14,12 +14,12 @@
     <script>
 
 var orbits = [];
-var colors = [0x00bfff, 0x00bfff, 0xff8000, 0xff8000, 0xff00ff, 0xff00ff];
+var colors = [0xff0000, 0xffbf00, 0x80ff00, 0x00ffbf, 0xff00ff, 0xff00ff];
 var UNITS_PER_30_MIN = 10;
 var UNIT_PER_FRAME = 0.01;
 
 function generateOrbit(num, freq, offset, distance, appraoch, scene) {
-  var material = new THREE.MeshBasicMaterial({wireframe: true, color: colors[num-1], specular: 0x555555, shininess: 30, opacity: 0.5, transparent: true});
+  var material = new THREE.MeshBasicMaterial({wireframe: true, color: colors[num-1], specular: 0x555555, shininess: 30, opacity: 0.3, transparent: true});
   var radius = distance;  // did Sarah give radius or diameter? 
   
   var circleGeometry = new THREE.CircleGeometry( radius, 60);
@@ -29,15 +29,15 @@ function generateOrbit(num, freq, offset, distance, appraoch, scene) {
   scene.add(orbit);
 
   var circumference = 2 * Math.PI * radius;
-  // TODO : solve for rotation per animation frame in radians
-  var rotationSpeed = Math.random() / 10;
+  // arc length = center angle in radians * radius
+  var shipRotationRadians = UNITS_PER_30_MIN / radius;
   // TODO : solve for # of ships based on circumference and frequency
   var num = Math.round(Math.random() * 7) + 2;
   // TODO : factor in offset into here somehow
 
   var spheres = [];
   var geometry = new THREE.SphereGeometry( 1, 32, 32 );
-  var material = new THREE.MeshBasicMaterial( {color: 0xffff00, specular: 0x555555, shininess: 30, opacity: 0.8, transparent: true} );
+  var material = new THREE.MeshBasicMaterial( {color: colors[num-1], specular: 0x555555, shininess: 30, opacity: 0.8, transparent: true} );
   for (var i = 0; i < num; ++i) {
     var sphere = new THREE.Mesh( geometry, material );
     scene.add(sphere);
@@ -47,7 +47,7 @@ function generateOrbit(num, freq, offset, distance, appraoch, scene) {
   orbits.push({
     orbit: orbit,
     spheres: spheres,
-    rotationSpeed: rotationSpeed,
+    shipRotationRadians: shipRotationRadians,
     radius: distance,
     // TODO : get the actual angles based off the sketch
     orbitRotation: Math.random() * Math.PI * 2,
@@ -60,7 +60,10 @@ var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHe
 
 
 generateOrbit(1, 3, 1, 1.5, 12, scene);
+generateOrbit(2, 5, 3, 3.5, 3, scene);
 generateOrbit(3, 6, 3, 6, 4, scene);
+generateOrbit(4, 10, 0, 8, 9, scene);
+generateOrbit(5, 12, 0, 10, 7, scene);
 generateOrbit(6, 15, 0, 15, 2, scene);
 
 camera.position.z = 10;
@@ -92,7 +95,7 @@ var ship_rotation_vector = new THREE.Vector3(0,0,1);
 function render() {
     //   orbit: orbit,
     // spheres: spheres,
-    // rotationSpeed: rotationSpeed,
+    // shipRotationRadians: shipRotationRadians,
     // radius: distance,
     // orbitRotation: Math.random() * Math.PI * 2,
     // shipRotation: 0,
@@ -101,10 +104,12 @@ function render() {
 
     o.orbit.matrix.makeRotationAxis(orbit_rotation_vector, o.orbitRotation);
     o.orbit.matrixAutoUpdate = false;
-    o.shipRotation += o.rotationSpeed;
+    o.shipRotation += o.shipRotationRadians/100;
     for(var j = 0; j < o.spheres.length; ++j) {
       var s = o.spheres[j];
-      var shipVector = new THREE.Vector3(0, o.radius, 0).applyAxisAngle(ship_rotation_vector, o.shipRotation);  // spin the ships around the ring
+      var rotationOffset = j * Math.PI * 2 / o.spheres.length;
+      // applyAxisAngle(normalized vector3, angle in radians)
+      var shipVector = new THREE.Vector3(0, o.radius, 0).applyAxisAngle(ship_rotation_vector, o.shipRotation + rotationOffset);  // spin the ships around the ring
       shipVector.applyAxisAngle(orbit_rotation_vector, o.orbitRotation);  // twist the ring of ships to match the orbit
       s.matrix.setPosition(shipVector);
       s.matrixAutoUpdate = false;
