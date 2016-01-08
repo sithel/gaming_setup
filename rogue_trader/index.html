@@ -82,7 +82,7 @@ function generatePath(scene) {
   corvo = {
     path: path,
     ship: ship,
-    position: 10,
+    position: -20,
     rate: rate,
     rotation: 2,
     approach: new THREE.Vector3(1,0,1),
@@ -122,13 +122,17 @@ function render() {
   corvo.approach.x += view_state.mod_x;
   corvo.approach.y += view_state.mod_y;
   corvo.approach.z += view_state.mod_z;
+  corvo.approach.normalize();
   corvo.rotation += view_state.mod_r;
   corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
-  corvo.position += 0.01;
-  // TODO : make this shit work
-  // var shipVector = new THREE.Vector3(0, corvo.position, 0).applyAxisAngle(corvo.approach, corvo.rotation);
-  // shipVector.applyAxisAngle(corvo.approach, corvo.rotation);
-  // corvo.ship.matrix.setPosition(shipVector);
+  corvo.position += corvo.rate;
+  if (corvo.position > 20) {
+    corvo.position = -20;
+  }
+  var shipVector = new THREE.Vector3(0, corvo.position, 0);
+  shipVector.applyAxisAngle(corvo.approach, corvo.rotation);
+  corvo.ship.matrix.setPosition(shipVector);
+  corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
   corvo.ship.matrixAutoUpdate = false;
   corvo.path.matrixAutoUpdate = false;
 
