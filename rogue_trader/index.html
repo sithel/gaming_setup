@@ -16,6 +16,8 @@
     font-family: monospace;
     padding: 10px;
     ">
+
+r/t : alter approach window<br>
 w : toggle orbit display <br>
 i/k : alter angle <br>
 a/z : alter x<br>
@@ -70,10 +72,13 @@ function generateOrbit(num, freq, offset, radius, appraoch, scene) {
 }
 
 var corvo = null;
+var pathLength = 40;
 function generatePath(scene) {
-  var pathLength = 40;
   var path = new THREE.Mesh( new THREE.CylinderGeometry( 0.05, 0.05, pathLength, 32 ), new THREE.MeshBasicMaterial( {color: 0xffffff} ) );
   scene.add( path );
+  var approachRadius = 20;
+  var dangerCone = new THREE.Mesh( new THREE.CylinderGeometry( 0.5, approachRadius, pathLength, 15 ), new THREE.MeshBasicMaterial( {wireframe: true, opacity: 0.1, transparent: true,color: 0xffffff} ) );
+  scene.add( dangerCone );
   var shipMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0x555555, shininess: 30} );
   var ship = new THREE.Mesh( new THREE.SphereGeometry( 0.5, 10, 10 ), shipMaterial );
   scene.add( ship );
@@ -82,9 +87,11 @@ function generatePath(scene) {
   corvo = {
     path: path,
     ship: ship,
+    cone: dangerCone,
     position: -20,
     rate: rate,
     rotation: 2,
+    approachRadius: approachRadius,
     approach: new THREE.Vector3(1,0,1),
   }
 }
@@ -119,6 +126,7 @@ var raycaster = new THREE.Raycaster();
 var orbit_rotation_vector = new THREE.Vector3(0,1,0);
 var ship_rotation_vector = new THREE.Vector3(0,0,1);
 function detectHit() {
+  return;
   // http://stackoverflow.com/questions/11473755/how-to-detect-collision-in-three-js
   for (var vi = 0; vi < corvo.ship.geometry.vertices.length; ++vi){
     var localVertex = corvo.ship.geometry.vertices[vi].clone();
@@ -139,6 +147,7 @@ function detectHit() {
   }
   return false;
 }
+var reb = 0;
 function render() {
   if (true || view_state.running) {
     corvo.approach.x += view_state.mod_x;
@@ -155,8 +164,14 @@ function render() {
     shipVector.applyAxisAngle(corvo.approach, corvo.rotation);
     corvo.ship.matrix.setPosition(shipVector);
     corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
+    corvo.cone.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
+
+    var shipVector = new THREE.Vector3(0, -20, 0);
+    shipVector.applyAxisAngle(corvo.approach, corvo.rotation);
+    corvo.cone.matrix.setPosition(shipVector);
     corvo.ship.matrixAutoUpdate = false;
     corvo.path.matrixAutoUpdate = false;
+    corvo.cone.matrixAutoUpdate = false;
 
     for(var i = 0; i < orbits.length; ++i) {
       var o = orbits[i];
@@ -235,6 +250,12 @@ window.onkeydown = function(e) {
     view_state.mod_z = 0.01
   } else if (key == 67) { // c
     view_state.mod_z = -0.01
+  } else if (key == 82) { // r
+    corvo.approachRadius += 0.1;
+    corvo.cone.geometry = new THREE.CylinderGeometry( 0.5, corvo.approachRadius, pathLength, 15 )
+  } else if (key == 84) { // t
+    corvo.approachRadius -= 0.1;
+    corvo.cone.geometry = new THREE.CylinderGeometry( 0.5, corvo.approachRadius, pathLength, 15 )
   }
 }
 
