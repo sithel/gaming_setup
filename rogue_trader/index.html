@@ -32,7 +32,7 @@ var UNITS_PER_30_MIN = 10;
 var UNIT_PER_FRAME = 0.01;
 
 function generateOrbit(num, freq, offset, radius, appraoch, scene) {
-  var material = new THREE.MeshBasicMaterial({wireframe: true, color: colors[num-1], specular: 0x555555, shininess: 30, opacity: 0.3, transparent: true});
+  var material = new THREE.MeshBasicMaterial({wireframe: true, color: colors[num-1], opacity: 0.3, transparent: true});
   window.rebMat = material;
   var circleGeometry = new THREE.RingGeometry( radius - 0.1, radius + 0.1, 60 );//new THREE.CircleGeometry( radius, 60);
   var orbit = new THREE.Mesh( circleGeometry, material );
@@ -48,7 +48,7 @@ function generateOrbit(num, freq, offset, radius, appraoch, scene) {
   // TODO : factor in offset into here somehow
 
   var spheres = [];
-  var geometry = new THREE.SphereGeometry( 0.5, 32, 32 );
+  var geometry = new THREE.SphereGeometry( 0.5, 10,10);
   var material = new THREE.MeshPhongMaterial({
     color: colors[num-1], specular: 0x555555, shininess: 30
   } );
@@ -75,10 +75,10 @@ function generatePath(scene) {
   var path = new THREE.Mesh( new THREE.CylinderGeometry( 0.05, 0.05, pathLength, 32 ), new THREE.MeshBasicMaterial( {color: 0xffffff} ) );
   scene.add( path );
   var shipMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0x555555, shininess: 30} );
-  var ship = new THREE.Mesh( new THREE.SphereGeometry( 0.5, 32, 32 ), shipMaterial );
+  var ship = new THREE.Mesh( new THREE.SphereGeometry( 0.5, 10, 10 ), shipMaterial );
   scene.add( ship );
   // TODO : calc correct rate
-  var rate = 0.01;
+  var rate = 0.1;
   corvo = {
     path: path,
     ship: ship,
@@ -115,41 +115,70 @@ var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 
-
+var raycaster = new THREE.Raycaster();
 var orbit_rotation_vector = new THREE.Vector3(0,1,0);
 var ship_rotation_vector = new THREE.Vector3(0,0,1);
-function render() {
-  corvo.approach.x += view_state.mod_x;
-  corvo.approach.y += view_state.mod_y;
-  corvo.approach.z += view_state.mod_z;
-  corvo.approach.normalize();
-  corvo.rotation += view_state.mod_r;
-  corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
-  corvo.position += corvo.rate;
-  if (corvo.position > 20) {
-    corvo.position = -20;
+function detectHit() {
+  // http://stackoverflow.com/questions/11473755/how-to-detect-collision-in-three-js
+  for (var vi = 0; vi < corvo.ship.geometry.vertices.length; ++vi){
+    var localVertex = corvo.ship.geometry.vertices[vi].clone();
+    var globalVertex = corvo.ship.matrix.multiplyVector3(localVertex);
+    var directionVector = globalVertex.sub( corvo.ship.position );
+
+    raycaster.set(corvo.ship.position, directionVector.clone().normalize());
+
+    var ships = orbits.reduce(function(prev, cur){
+      return prev.concat(cur.spheres)
+    }, []);
+    var collisionResults = raycaster.intersectObjects( ships );
+    if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()){
+      console.log("collisionResults : ", collisionResults.length);
+      console.log(">> ", collisionResults[0].distance," vs ",directionVector.length());
+      return true;
+    }
   }
-  var shipVector = new THREE.Vector3(0, corvo.position, 0);
-  shipVector.applyAxisAngle(corvo.approach, corvo.rotation);
-  corvo.ship.matrix.setPosition(shipVector);
-  corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
-  corvo.ship.matrixAutoUpdate = false;
-  corvo.path.matrixAutoUpdate = false;
+  return false;
+}
+function render() {
+  if (true || view_state.running) {
+    corvo.approach.x += view_state.mod_x;
+    corvo.approach.y += view_state.mod_y;
+    corvo.approach.z += view_state.mod_z;
+    corvo.approach.normalize();
+    corvo.rotation += view_state.mod_r;
+    corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
+    corvo.position += corvo.rate;
+    if (corvo.position > 20) {
+      corvo.position = -20;
+    }
+    var shipVector = new THREE.Vector3(0, corvo.position, 0);
+    shipVector.applyAxisAngle(corvo.approach, corvo.rotation);
+    corvo.ship.matrix.setPosition(shipVector);
+    corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
+    corvo.ship.matrixAutoUpdate = false;
+    corvo.path.matrixAutoUpdate = false;
 
-  for(var i = 0; i < orbits.length; ++i) {
-    var o = orbits[i];
+    for(var i = 0; i < orbits.length; ++i) {
+      var o = orbits[i];
 
-    o.orbit.matrix.makeRotationAxis(orbit_rotation_vector, o.orbitRotation);
-    o.orbit.matrixAutoUpdate = false;
-    o.shipRotation += o.shipRotationRadians/100;
-    for(var j = 0; j < o.spheres.length; ++j) {
-      var s = o.spheres[j];
-      var rotationOffset = j * Math.PI * 2 / o.spheres.length;
-      // applyAxisAngle(normalized vector3, angle in radians)
-      var shipVector = new THREE.Vector3(0, o.radius, 0).applyAxisAngle(ship_rotation_vector, o.shipRotation + rotationOffset);  // spin the ships around the ring
-      shipVector.applyAxisAngle(orbit_rotation_vector, o.orbitRotation);  // twist the ring of ships to match the orbit
-      s.matrix.setPosition(shipVector);
-      s.matrixAutoUpdate = false;
+      o.orbit.matrix.makeRotationAxis(orbit_rotation_vector, o.orbitRotation);
+      o.orbit.matrixAutoUpdate = false;
+      o.shipRotation += o.shipRotationRadians/100;
+      for(var j = 0; j < o.spheres.length; ++j) {
+        var s = o.spheres[j];
+        var rotationOffset = j * Math.PI * 2 / o.spheres.length;
+        // applyAxisAngle(normalized vector3, angle in radians)
+        var shipVector = new THREE.Vector3(0, o.radius, 0).applyAxisAngle(ship_rotation_vector, o.shipRotation + rotationOffset);  // spin the ships around the ring
+        shipVector.applyAxisAngle(orbit_rotation_vector, o.orbitRotation);  // twist the ring of ships to match the orbit
+        s.matrix.setPosition(shipVector);
+        s.matrixAutoUpdate = false;
+      }
+    }
+
+    if (detectHit()) {
+      console.log("OH SHIT! HIT!");
+      // corvo.ship.material.color.setRGB(1,0,0);
+      view_state.running = false;
     }
   }
   requestAnimationFrame( render );
@@ -159,6 +188,7 @@ controls = new THREE.OrbitControls( camera, renderer.domElement );
 
 
 var view_state = {
+  running: true,
   orbits: 0,    // 0 = wireframe, 1 = disks, 2 = nothing
   mod_x: 0,
   mod_r: 0,
