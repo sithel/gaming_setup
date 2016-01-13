@@ -2,8 +2,18 @@ function displayPlan() {
 
     var orbits = [];
     var colors = [0xff0000, 0xffbf00, 0x80ff00, 0x00ffbf, 0x0000ff, 0xff00ff];
-    var UNITS_PER_30_MIN = 10;
+    var SPEED_YUVATH = 10;  // Yuvath guardians
+    var SPEED_YACHT = 7;  // Captain's yatch
+    var SPEED_GAUNTLET = 4;  // Combat dropships
     var UNIT_PER_FRAME = 0.01;
+
+    function number_of_ships(radius, frequency) {
+        //frequency = ships per SPEED_YUVATH
+        var circumference = 2 * Math.PI * radius;
+        var unit_time_per_orbit = circumference / SPEED_YUVATH;
+        var ships_per_orbit = unit_time_per_orbit / frequency;
+        return ships_per_orbit;
+    }
 
     function generateOrbit(num, freq, offset, radius, approach, scene) {
       var material = new THREE.MeshBasicMaterial({wireframe: true, color: colors[num-1], specular: 0x555555, shininess: 30, opacity: 0.3, transparent: true});
@@ -16,8 +26,11 @@ function displayPlan() {
 
       var circumference = 2 * Math.PI * radius;
       // arc length = center angle in radians * radius
-      var shipRotationRadians = UNITS_PER_30_MIN / radius;
+      var shipRotationRadians = SPEED_YUVATH / radius;
       // TODO : solve for # of ships based on circumference and frequency
+
+
+
       var count = Math.round(Math.random() * 7) + 2;
       // TODO : factor in offset into here somehow
 
