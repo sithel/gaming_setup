@@ -27,7 +27,7 @@ function displayPlan() {
       var spheres = [];
       var geometry = new THREE.SphereGeometry( 1.0, 10, 10);
       var material = new THREE.MeshPhongMaterial({
-        color: colors[num-1], specular: 0x555555, shininess: 30, wireframe: true
+        color: colors[num-1], specular: 0x555555, shininess: 30
       } );
       for (var i = 0; i < shipCount; ++i) {
         var sphere = new THREE.Mesh( geometry, material );
@@ -121,9 +121,39 @@ function displayPlan() {
       }
       return false;
     }
-    var reb = 0;
-    function render() {
-      if (true || view_state.running) {
+    function renderOrbits() {
+        if (view_state.orbit) {
+          for(var i = 0; i < orbits.length; ++i) {
+            var o = orbits[i];
+
+            o.shipRotation += o.shipRotationRadians/100;
+            var shipVector = ship_rotation_vector.clone();
+            shipVector.applyAxisAngle(orbit_rotation_vector, o.orbitRotation);
+            for(var j = 0; j < o.spheres.length; ++j) {
+              var s = o.spheres[j];
+              var rotationOffset = j * Math.PI * 2 / o.spheres.length;
+              // // applyAxisAngle(normalized vector3, angle in radians)
+              s.position.applyAxisAngle(shipVector, o.shipRotationRadians/100);
+            }
+          }
+        } else {
+          for(var i = 0; i < orbits.length; ++i) {
+            var o = orbits[i];
+            for(var j = 0; j < o.spheres.length; ++j) {
+              var s = o.spheres[j];
+              var attackVector = s.position.clone();
+              attackVector.sub(corvo.ship.position);
+              attackVector.setLength(SPEED_YACHT/100);
+              console.log("My attack vector is : ", attackVector);
+              // var m = new THREE.Matrix4();
+              // m.makeTranslation(attackVector.x, attackVector.y, attackVector.z);
+              // s.matrixAutoUpdate = false;
+              // s.matrix.multiply(m);
+            }
+          }
+        }
+    }
+    function renderAttack() {
         corvo.approach.x += view_state.mod_x;
         corvo.approach.y += view_state.mod_y;
         corvo.approach.z += view_state.mod_z;
@@ -134,36 +164,47 @@ function displayPlan() {
         if (corvo.position > 20) {
           corvo.position = -20;
         }
+
         var shipVector = new THREE.Vector3(0, corvo.position, 0);
         shipVector.applyAxisAngle(corvo.approach, corvo.rotation);
         corvo.ship.matrix.setPosition(shipVector);
         corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
         corvo.cone.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
 
-        var shipVector = new THREE.Vector3(0, -10, 0);
-        shipVector.applyAxisAngle(corvo.approach, corvo.rotation);
-        corvo.cone.matrix.setPosition(shipVector);
+        var dangerConeVector = new THREE.Vector3(0, -10, 0);
+        dangerConeVector.applyAxisAngle(corvo.approach, corvo.rotation);
+        corvo.cone.matrix.setPosition(dangerConeVector);
+
         corvo.ship.matrixAutoUpdate = false;
         corvo.path.matrixAutoUpdate = false;
         corvo.cone.matrixAutoUpdate = false;
+    }
+    function prepInitialWorldState() {
+      for(var i = 0; i < orbits.length; ++i) {
+            var o = orbits[i];
 
-        for(var i = 0; i < orbits.length; ++i) {
-          var o = orbits[i];
+            o.orbit.matrix.makeRotationAxis(orbit_rotation_vector, o.orbitRotation);
+            o.orbit.matrixAutoUpdate = false;
 
-          o.orbit.matrix.makeRotationAxis(orbit_rotation_vector, o.orbitRotation);
-          o.orbit.matrixAutoUpdate = false;
-          o.shipRotation += o.shipRotationRadians/100;
-          for(var j = 0; j < o.spheres.length; ++j) {
-            var s = o.spheres[j];
-            var rotationOffset = j * Math.PI * 2 / o.spheres.length;
-            // applyAxisAngle(normalized vector3, angle in radians)
-            var shipVector = new THREE.Vector3(0, o.radius, 0).applyAxisAngle(ship_rotation_vector, o.shipRotation + rotationOffset);  // spin the ships around the ring
-            shipVector.applyAxisAngle(orbit_rotation_vector, o.orbitRotation);  // twist the ring of ships to match the orbit
-            s.matrix.setPosition(shipVector);
-            s.matrixAutoUpdate = false;
-          }
+            for(var j = 0; j < o.spheres.length; ++j) {
+              var s = o.spheres[j];
+              var rotationOffset = j * Math.PI * 2 / o.spheres.length;
+              var shipVector = new THREE.Vector3(0, o.radius, 0).applyAxisAngle(ship_rotation_vector, o.shipRotation + rotationOffset);  // spin the ships around the ring
+              shipVector.applyAxisAngle(orbit_rotation_vector, o.orbitRotation);  // twist the ring of ships to match the orbit
+              s.position.copy(shipVector);
+            }
         }
-
+    }
+    function render() {
+      renderer.render( scene, camera );
+      if (!view_state.rendered_once) {
+        prepInitialWorldState();
+        view_state.rendered_once = true;
+      }
+      if (true || view_state.running) {
+        // orbits[0].sphers[0].
+        renderAttack();
+        renderOrbits();
         if (detectHit()) {
           console.log("OH SHIT! HIT!");
           // corvo.ship.material.color.setRGB(1,0,0);
@@ -171,7 +212,6 @@ function displayPlan() {
         }
       }
       requestAnimationFrame( render );
-      renderer.render( scene, camera );
     }
     controls = new THREE.OrbitControls( camera, renderer.domElement );
 
@@ -183,6 +223,7 @@ function displayPlan() {
       mod_r: 0,
       mod_y: 0,
       mod_z: 0,
+      orbit: true,
     }
     window.onkeydown = function(e) {
       var key = e.keyCode ? e.keyCode : e.which;
@@ -230,6 +271,8 @@ function displayPlan() {
       } else if (key == 84) { // t
         corvo.approachRadius -= 0.1;
         corvo.cone.geometry = new THREE.CylinderGeometry( 0.5, corvo.approachRadius, pathLength / 2, 15 )
+      } else if (key == 80) { // p
+        view_state.orbit = !view_state.orbit;
       }
     }
 
@@ -247,5 +290,9 @@ function displayPlan() {
     }
 
 
+    window.reb = {
+      corvo: corvo,
+      orbits: orbits,
+    }
     render();
 }
