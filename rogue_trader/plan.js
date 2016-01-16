@@ -10,12 +10,10 @@ function displayPlan() {
     var orbits = [];
     var colors = [0xff0000, 0xffbf00, 0x80ff00, 0x00ffbf, 0x0000ff, 0xff00ff];
 
-    var YUVATH_ORBIT_TILT = [0, 90, 120, 270, 210, 60]
-
     var UNITS_PER_30_MIN = 10;
     var UNIT_PER_FRAME = 0.01;
 
-    function generateOrbit(num, freq, offset, radius, appraoch, scene) {
+    function generateOrbit(num, freq, offset, radius, approach, shipCount, scene) {
       var material = new THREE.MeshBasicMaterial({wireframe: true, color: colors[num-1], opacity: 0.3, transparent: true});
       window.rebMat = material;
       var circleGeometry = new THREE.RingGeometry( radius - 0.1, radius + 0.1, 60 );//new THREE.CircleGeometry( radius, 60);
@@ -28,7 +26,6 @@ function displayPlan() {
       // arc length = center angle in radians * radius
       var shipRotationRadians = UNITS_PER_30_MIN / radius;
       // TODO : solve for # of ships based on circumference and frequency
-      var count = Math.round(Math.random() * 7) + 2;
       // TODO : factor in offset into here somehow
 
       var spheres = [];
@@ -36,7 +33,7 @@ function displayPlan() {
       var material = new THREE.MeshPhongMaterial({
         color: colors[num-1], specular: 0x555555, shininess: 30
       } );
-      for (var i = 0; i < count; ++i) {
+      for (var i = 0; i < shipCount; ++i) {
         var sphere = new THREE.Mesh( geometry, material );
         scene.add(sphere);
         spheres.push(sphere);
@@ -47,7 +44,7 @@ function displayPlan() {
         spheres: spheres,
         shipRotationRadians: shipRotationRadians,
         radius: radius,
-        orbitRotation: YUVATH_ORBIT_TILT[num-1] * Math.PI / 180,
+        orbitRotation: approach * Math.PI / 180,
         shipRotation: 0,
       });
     }
@@ -89,13 +86,15 @@ function displayPlan() {
     var light = new THREE.AmbientLight( 0x222222 ); // soft white light
     scene.add( light );
 
+    // Number of ships (n) determined by:
+    // n = (circumference * frequency) / velocity
 
-    generateOrbit(1, 3, 1, 1.5, 12, scene);
-    generateOrbit(2, 5, 3, 3.5, 3, scene);
-    generateOrbit(3, 6, 3, 6, 4, scene);
-    generateOrbit(4, 10, 0, 8, 9, scene);
-    generateOrbit(5, 12, 0, 10, 7, scene);
-    generateOrbit(6, 15, 0, 15, 2, scene);
+    generateOrbit(1, 3, 1, 1.5, 0, 9, scene);
+    generateOrbit(2, 5, 3, 3.5, 90, 13, scene);
+    generateOrbit(3, 6, 3, 6, 120, 18, scene);
+    generateOrbit(4, 10, 0, 8, 270, 15, scene);
+    generateOrbit(5, 12, 0, 10, 210, 15, scene);
+    generateOrbit(6, 15, 0, 15, 60, 18, scene);
 
     generatePath(scene);
 
