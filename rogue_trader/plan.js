@@ -9,6 +9,9 @@ function displayPlan() {
 
     var orbits = [];
     var colors = [0xff0000, 0xffbf00, 0x80ff00, 0x00ffbf, 0x0000ff, 0xff00ff];
+
+    var YUVATH_ORBIT_TILT = [0, 90, 120, 270, 210, 60]
+
     var UNITS_PER_30_MIN = 10;
     var UNIT_PER_FRAME = 0.01;
 
@@ -44,8 +47,7 @@ function displayPlan() {
         spheres: spheres,
         shipRotationRadians: shipRotationRadians,
         radius: radius,
-        // TODO : get the actual angles based off the sketch
-        orbitRotation: Math.random() * Math.PI * 2,
+        orbitRotation: YUVATH_ORBIT_TILT[num-1] * Math.PI / 180,
         shipRotation: 0,
       });
     }
