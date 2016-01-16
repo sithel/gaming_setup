@@ -42,6 +42,7 @@ function displayPlan() {
         radius: radius,
         orbitRotation: approach * Math.PI / 180,
         shipRotation: 0,
+        savedPosition: spheres.map(function(){ return new THREE.Vector3(0,0,0)}),
       });
     }
 
@@ -122,7 +123,7 @@ function displayPlan() {
       return false;
     }
     function renderOrbits() {
-        if (view_state.orbit) {
+        if (view_state.orbit == 'guard') {
           for(var i = 0; i < orbits.length; ++i) {
             var o = orbits[i];
 
@@ -134,9 +135,10 @@ function displayPlan() {
               var rotationOffset = j * Math.PI * 2 / o.spheres.length;
               // // applyAxisAngle(normalized vector3, angle in radians)
               s.position.applyAxisAngle(shipVector, o.shipRotationRadians/100);
+              o.savedPosition[j].copy(s.position);
             }
           }
-        } else {
+        } else if (view_state.orbit == 'attack') {
           for(var i = 0; i < orbits.length; ++i) {
             var o = orbits[i];
             for(var j = 0; j < o.spheres.length; ++j) {
@@ -144,11 +146,26 @@ function displayPlan() {
               var attackVector = s.position.clone();
               attackVector.sub(corvo.ship.position);
               attackVector.setLength(SPEED_YACHT/100);
-              console.log("My attack vector is : ", attackVector);
-              // var m = new THREE.Matrix4();
-              // m.makeTranslation(attackVector.x, attackVector.y, attackVector.z);
-              // s.matrixAutoUpdate = false;
-              // s.matrix.multiply(m);
+              s.position.sub(attackVector);
+            }
+          }
+        } else {
+          for(var i = 0; i < orbits.length; ++i) {
+            var o = orbits[i];
+            for(var j = 0; j < o.spheres.length; ++j) {
+              var s = o.spheres[j];
+              var returnVector = s.position.clone();
+              returnVector.sub(o.savedPosition[j]);
+              console.log("> distance home : ",returnVector.length());
+              if (returnVector.length() < 0.001) {
+                // FUCK YOU, CODE, WHY ARE YOU NOT RETURNING TO THE ORIGINAL POSITION!?!??!
+                view_state.orbit = 'guard';
+                s.position.copy(o.savedPosition[j]);
+                s.position.copy(o.savedPosition[j]);
+                continue;
+              }
+              returnVector.setLength(SPEED_YACHT/100);
+              s.position.sub(returnVector);
             }
           }
         }
@@ -167,7 +184,7 @@ function displayPlan() {
 
         var shipVector = new THREE.Vector3(0, corvo.position, 0);
         shipVector.applyAxisAngle(corvo.approach, corvo.rotation);
-        corvo.ship.matrix.setPosition(shipVector);
+        corvo.ship.position.copy(shipVector);
         corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
         corvo.cone.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
 
@@ -175,7 +192,6 @@ function displayPlan() {
         dangerConeVector.applyAxisAngle(corvo.approach, corvo.rotation);
         corvo.cone.matrix.setPosition(dangerConeVector);
 
-        corvo.ship.matrixAutoUpdate = false;
         corvo.path.matrixAutoUpdate = false;
         corvo.cone.matrixAutoUpdate = false;
     }
@@ -223,7 +239,7 @@ function displayPlan() {
       mod_r: 0,
       mod_y: 0,
       mod_z: 0,
-      orbit: true,
+      orbit: 'guard',
     }
     window.onkeydown = function(e) {
       var key = e.keyCode ? e.keyCode : e.which;
@@ -272,7 +288,7 @@ function displayPlan() {
         corvo.approachRadius -= 0.1;
         corvo.cone.geometry = new THREE.CylinderGeometry( 0.5, corvo.approachRadius, pathLength / 2, 15 )
       } else if (key == 80) { // p
-        view_state.orbit = !view_state.orbit;
+        view_state.orbit = (view_state.orbit == 'attack') ? 'return' : 'attack';
       }
     }
 
