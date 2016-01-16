@@ -7,11 +7,8 @@ function displayPlan() {
     var SPEED_GAUNTLET = 4;  // Combat dropships
     var UNIT_PER_FRAME = 0.01;
 
-    var orbits = [];
     var colors = [0xff0000, 0xffbf00, 0x80ff00, 0x00ffbf, 0x0000ff, 0xff00ff];
 
-    var UNITS_PER_30_MIN = 10;
-    var UNIT_PER_FRAME = 0.01;
 
     function generateOrbit(num, freq, offset, radius, approach, shipCount, scene) {
       var material = new THREE.MeshBasicMaterial({wireframe: true, color: colors[num-1], opacity: 0.3, transparent: true});
@@ -24,7 +21,7 @@ function displayPlan() {
 
       var circumference = 2 * Math.PI * radius;
       // arc length = center angle in radians * radius
-      var shipRotationRadians = UNITS_PER_30_MIN / radius;
+      var shipRotationRadians = SPEED_YUVATH / radius;
       // TODO : solve for # of ships based on circumference and frequency
       // TODO : factor in offset into here somehow
 
@@ -60,14 +57,12 @@ function displayPlan() {
       var shipMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0x555555, shininess: 30} );
       var ship = new THREE.Mesh( new THREE.SphereGeometry( 0.5, 10, 10 ), shipMaterial );
       scene.add( ship );
-      // TODO : calc correct rate
-      var rate = 0.1;
       corvo = {
         path: path,
         ship: ship,
         cone: dangerCone,
         position: -20,
-        rate: rate,
+        rate: SPEED_YACHT,
         rotation: 2,
         approachRadius: approachRadius,
         approach: new THREE.Vector3(1,0,1),
