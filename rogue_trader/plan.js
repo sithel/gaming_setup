@@ -22,13 +22,12 @@ function displayPlan() {
       var circumference = 2 * Math.PI * radius;
       // arc length = center angle in radians * radius
       var shipRotationRadians = SPEED_YUVATH / radius;
-      // TODO : solve for # of ships based on circumference and frequency
       // TODO : factor in offset into here somehow
 
       var spheres = [];
-      var geometry = new THREE.SphereGeometry( 0.5, 10,10);
+      var geometry = new THREE.SphereGeometry( 1.0, 10, 10);
       var material = new THREE.MeshPhongMaterial({
-        color: colors[num-1], specular: 0x555555, shininess: 30
+        color: colors[num-1], specular: 0x555555, shininess: 30, wireframe: true
       } );
       for (var i = 0; i < shipCount; ++i) {
         var sphere = new THREE.Mesh( geometry, material );
@@ -51,8 +50,8 @@ function displayPlan() {
     function generatePath(scene) {
       var path = new THREE.Mesh( new THREE.CylinderGeometry( 0.05, 0.05, pathLength, 32 ), new THREE.MeshBasicMaterial( {color: 0xffffff} ) );
       scene.add( path );
-      var approachRadius = 20;
-      var dangerCone = new THREE.Mesh( new THREE.CylinderGeometry( 0.5, approachRadius, pathLength, 15 ), new THREE.MeshBasicMaterial( {wireframe: true, opacity: 0.1, transparent: true,color: 0xffffff} ) );
+      var approachRadius = 0.6999999999999846;
+      var dangerCone = new THREE.Mesh( new THREE.CylinderGeometry( 0.5, approachRadius, pathLength / 2, 15 ), new THREE.MeshBasicMaterial( {wireframe: true, opacity: 0.1, transparent: true,color: 0xffffff} ) );
       scene.add( dangerCone );
       var shipMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0x555555, shininess: 30} );
       var ship = new THREE.Mesh( new THREE.SphereGeometry( 0.5, 10, 10 ), shipMaterial );
@@ -61,11 +60,11 @@ function displayPlan() {
         path: path,
         ship: ship,
         cone: dangerCone,
-        position: -20,
+        position: pathLength / -2,
         rate: SPEED_YACHT,
-        rotation: 2,
+        rotation: 3.929999999999959,
         approachRadius: approachRadius,
-        approach: new THREE.Vector3(1,0,1),
+        approach: new THREE.Vector3(0.7264792716409859,0,0.6871883787404897),
       }
     }
 
@@ -131,7 +130,7 @@ function displayPlan() {
         corvo.approach.normalize();
         corvo.rotation += view_state.mod_r;
         corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
-        corvo.position += corvo.rate;
+        corvo.position += corvo.rate/100;
         if (corvo.position > 20) {
           corvo.position = -20;
         }
@@ -141,7 +140,7 @@ function displayPlan() {
         corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
         corvo.cone.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
 
-        var shipVector = new THREE.Vector3(0, -20, 0);
+        var shipVector = new THREE.Vector3(0, -10, 0);
         shipVector.applyAxisAngle(corvo.approach, corvo.rotation);
         corvo.cone.matrix.setPosition(shipVector);
         corvo.ship.matrixAutoUpdate = false;
@@ -227,10 +226,10 @@ function displayPlan() {
         view_state.mod_z = -0.01
       } else if (key == 82) { // r
         corvo.approachRadius += 0.1;
-        corvo.cone.geometry = new THREE.CylinderGeometry( 0.5, corvo.approachRadius, pathLength, 15 )
+        corvo.cone.geometry = new THREE.CylinderGeometry( 0.5, corvo.approachRadius, pathLength / 2, 15 )
       } else if (key == 84) { // t
         corvo.approachRadius -= 0.1;
-        corvo.cone.geometry = new THREE.CylinderGeometry( 0.5, corvo.approachRadius, pathLength, 15 )
+        corvo.cone.geometry = new THREE.CylinderGeometry( 0.5, corvo.approachRadius, pathLength / 2, 15 )
       }
     }
 
