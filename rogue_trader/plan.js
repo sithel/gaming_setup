@@ -150,23 +150,27 @@ function displayPlan() {
             }
           }
         } else {
+          var remainingDist = [];
           for(var i = 0; i < orbits.length; ++i) {
             var o = orbits[i];
             for(var j = 0; j < o.spheres.length; ++j) {
               var s = o.spheres[j];
               var returnVector = s.position.clone();
               returnVector.sub(o.savedPosition[j]);
-              console.log("> distance home : ",returnVector.length());
-              if (returnVector.length() < 0.001) {
-                // FUCK YOU, CODE, WHY ARE YOU NOT RETURNING TO THE ORIGINAL POSITION!?!??!
-                view_state.orbit = 'guard';
-                s.position.copy(o.savedPosition[j]);
+              remainingDist.push(returnVector.length());
+              if (returnVector.length() < 0.1) {
                 s.position.copy(o.savedPosition[j]);
                 continue;
               }
               returnVector.setLength(SPEED_YACHT/100);
               s.position.sub(returnVector);
             }
+          }
+          var allReturned = remainingDist.reduce(function(prev, cur) {
+            return prev && cur < 0.01;
+          }, true);
+          if (allReturned) {
+            view_state.orbit = 'guard';
           }
         }
     }
