@@ -5,7 +5,7 @@ function displayPlan() {
     var SPEED_YUVATH = 10;  // Yuvath guardians
     var SPEED_YACHT = 7;  // Captain's yatch
     var SPEED_GAUNTLET = 4;  // Combat dropships
-    var UNIT_PER_FRAME = 0.01;
+    var UNIT_PER_FRAME = 0.005;
 
     var colors = [0xff0000, 0xffbf00, 0x80ff00, 0x00ffbf, 0x0000ff, 0xff00ff];
 
@@ -25,14 +25,22 @@ function displayPlan() {
       // TODO : factor in offset into here somehow
 
       var spheres = [];
-      var geometry = new THREE.SphereGeometry( 1.0, 10, 10);
-      var material = new THREE.MeshPhongMaterial({
+      var zoneGeometry = new THREE.SphereGeometry( 1.0, 10, 10);
+      var zoneMaterial = new THREE.MeshPhongMaterial({
+        color: colors[num-1], specular: 0x555555, shininess: 30, transparent:true, opacity: 0.4,
+      } );
+      var enemyGeometry = new THREE.OctahedronGeometry( 0.1);
+      var enemyMaterial = new THREE.MeshPhongMaterial({
         color: colors[num-1], specular: 0x555555, shininess: 30
       } );
       for (var i = 0; i < shipCount; ++i) {
-        var sphere = new THREE.Mesh( geometry, material );
-        scene.add(sphere);
-        spheres.push(sphere);
+        var sphere = new THREE.Mesh( zoneGeometry, zoneMaterial );
+        var ship = new THREE.Mesh( enemyGeometry, enemyMaterial );
+        var group = new THREE.Object3D();
+        group.add(sphere);
+        group.add(ship);
+        spheres.push(group);
+        scene.add(group);
       }
 
       orbits.push({
@@ -54,12 +62,23 @@ function displayPlan() {
       var approachRadius = 0.6999999999999846;
       var dangerCone = new THREE.Mesh( new THREE.CylinderGeometry( 0.5, approachRadius, pathLength / 2, 15 ), new THREE.MeshBasicMaterial( {wireframe: true, opacity: 0.1, transparent: true,color: 0xffffff} ) );
       scene.add( dangerCone );
+      var zoneMaterial =  new THREE.MeshPhongMaterial({
+        color: 0xffffff, shininess: 30, transparent:true, opacity: 0.4,
+      } );
+      var zone = new THREE.Mesh( new THREE.SphereGeometry( 0.5, 10, 10 ), zoneMaterial );
+      zone.name = "zone";
+
       var shipMaterial = new THREE.MeshPhongMaterial({color: 0xffffff, specular: 0x555555, shininess: 30} );
-      var ship = new THREE.Mesh( new THREE.SphereGeometry( 0.5, 10, 10 ), shipMaterial );
-      scene.add( ship );
+      var ship = new THREE.Mesh(new THREE.OctahedronGeometry( 0.1), shipMaterial );
+      ship.name = "ship";
+
+      var group = new THREE.Object3D();
+      group.add(ship);
+      group.add(zone);
+      scene.add(group);
       corvo = {
         path: path,
-        ship: ship,
+        ship: group,
         cone: dangerCone,
         position: pathLength / -2,
         rate: SPEED_YACHT,
@@ -101,23 +120,15 @@ function displayPlan() {
     var orbit_rotation_vector = new THREE.Vector3(0,1,0);
     var ship_rotation_vector = new THREE.Vector3(0,0,1);
     function detectHit() {
-      return;
-      // http://stackoverflow.com/questions/11473755/how-to-detect-collision-in-three-js
-      for (var vi = 0; vi < corvo.ship.geometry.vertices.length; ++vi){
-        var localVertex = corvo.ship.geometry.vertices[vi].clone();
-        var globalVertex = corvo.ship.matrix.multiplyVector3(localVertex);
-        var directionVector = globalVertex.sub( corvo.ship.position );
-
-        raycaster.set(corvo.ship.position, directionVector.clone().normalize());
-
-        var ships = orbits.reduce(function(prev, cur){
-          return prev.concat(cur.spheres)
-        }, []);
-        var collisionResults = raycaster.intersectObjects( ships );
-        if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length()){
-          console.log("collisionResults : ", collisionResults.length);
-          console.log(">> ", collisionResults[0].distance," vs ",directionVector.length());
-          return true;
+      for(var i = 0; i < orbits.length; ++i) {
+        var o = orbits[i];
+        for(var j = 0; j < o.spheres.length; ++j) {
+          var s = o.spheres[j];
+          var distVect = s.position.clone();
+          distVect.sub(corvo.ship.position);
+          if (distVect.length() <= 1) {
+            return true;
+          }
         }
       }
       return false;
@@ -127,14 +138,14 @@ function displayPlan() {
           for(var i = 0; i < orbits.length; ++i) {
             var o = orbits[i];
 
-            o.shipRotation += o.shipRotationRadians/100;
+            o.shipRotation += o.shipRotationRadians * UNIT_PER_FRAME;
             var shipVector = ship_rotation_vector.clone();
             shipVector.applyAxisAngle(orbit_rotation_vector, o.orbitRotation);
             for(var j = 0; j < o.spheres.length; ++j) {
               var s = o.spheres[j];
               var rotationOffset = j * Math.PI * 2 / o.spheres.length;
               // // applyAxisAngle(normalized vector3, angle in radians)
-              s.position.applyAxisAngle(shipVector, o.shipRotationRadians/100);
+              s.position.applyAxisAngle(shipVector, o.shipRotationRadians * UNIT_PER_FRAME);
               o.savedPosition[j].copy(s.position);
             }
           }
@@ -145,7 +156,7 @@ function displayPlan() {
               var s = o.spheres[j];
               var attackVector = s.position.clone();
               attackVector.sub(corvo.ship.position);
-              attackVector.setLength(SPEED_YACHT/100);
+              attackVector.setLength(SPEED_YACHT * UNIT_PER_FRAME);
               s.position.sub(attackVector);
             }
           }
@@ -162,7 +173,7 @@ function displayPlan() {
                 s.position.copy(o.savedPosition[j]);
                 continue;
               }
-              returnVector.setLength(SPEED_YACHT/100);
+              returnVector.setLength(SPEED_YACHT * UNIT_PER_FRAME);
               s.position.sub(returnVector);
             }
           }
@@ -181,7 +192,7 @@ function displayPlan() {
         corvo.approach.normalize();
         corvo.rotation += view_state.mod_r;
         corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
-        corvo.position += corvo.rate/100;
+        corvo.position += corvo.rate * UNIT_PER_FRAME;
         if (corvo.position > 20) {
           corvo.position = -20;
         }
@@ -221,13 +232,14 @@ function displayPlan() {
         prepInitialWorldState();
         view_state.rendered_once = true;
       }
-      if (true || view_state.running) {
+      if (view_state.running) {
         // orbits[0].sphers[0].
         renderAttack();
         renderOrbits();
         if (detectHit()) {
           console.log("OH SHIT! HIT!");
-          // corvo.ship.material.color.setRGB(1,0,0);
+          corvo.ship.getObjectByName('zone').material.color.setRGB(1,0,0);
+          corvo.ship.getObjectByName('zone').material.wireframe = true;
           view_state.running = false;
         }
       }
@@ -293,6 +305,11 @@ function displayPlan() {
         corvo.cone.geometry = new THREE.CylinderGeometry( 0.5, corvo.approachRadius, pathLength / 2, 15 )
       } else if (key == 80) { // p
         view_state.orbit = (view_state.orbit == 'attack') ? 'return' : 'attack';
+      } else if (key == 79) { // o
+        corvo.position = -20;
+        view_state.running = true;
+        corvo.ship.getObjectByName('zone').material.color.setRGB(1,1,1);
+        corvo.ship.getObjectByName('zone').material.wireframe = false;
       }
     }
 
