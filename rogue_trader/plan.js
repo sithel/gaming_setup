@@ -84,7 +84,8 @@ function displayPlan() {
         rate: SPEED_YACHT,
         rotation: 3.929999999999959,
         approachRadius: approachRadius,
-        approach: new THREE.Vector3(0.7264792716409859,0,0.6871883787404897),
+        //TODO This does not seem to actually initialize the approach
+        approach: new THREE.Vector3(0.7481234574677676,-0.04194395817032711,0.6622325850933938),
       }
     }
 
@@ -134,97 +135,98 @@ function displayPlan() {
       return false;
     }
     function renderOrbits() {
-        if (view_state.orbit == 'guard') {
-          for(var i = 0; i < orbits.length; ++i) {
-            var o = orbits[i];
+      if (view_state.orbit == 'guard') {
+        for(var i = 0; i < orbits.length; ++i) {
+          var o = orbits[i];
 
-            o.shipRotation += o.shipRotationRadians * UNIT_PER_FRAME;
-            var shipVector = ship_rotation_vector.clone();
-            shipVector.applyAxisAngle(orbit_rotation_vector, o.orbitRotation);
-            for(var j = 0; j < o.spheres.length; ++j) {
-              var s = o.spheres[j];
-              var rotationOffset = j * Math.PI * 2 / o.spheres.length;
-              // // applyAxisAngle(normalized vector3, angle in radians)
-              s.position.applyAxisAngle(shipVector, o.shipRotationRadians * UNIT_PER_FRAME);
-              o.savedPosition[j].copy(s.position);
-            }
-          }
-        } else if (view_state.orbit == 'attack') {
-          for(var i = 0; i < orbits.length; ++i) {
-            var o = orbits[i];
-            for(var j = 0; j < o.spheres.length; ++j) {
-              var s = o.spheres[j];
-              var attackVector = s.position.clone();
-              attackVector.sub(corvo.ship.position);
-              attackVector.setLength(SPEED_YACHT * UNIT_PER_FRAME);
-              s.position.sub(attackVector);
-            }
-          }
-        } else {
-          var remainingDist = [];
-          for(var i = 0; i < orbits.length; ++i) {
-            var o = orbits[i];
-            for(var j = 0; j < o.spheres.length; ++j) {
-              var s = o.spheres[j];
-              var returnVector = s.position.clone();
-              returnVector.sub(o.savedPosition[j]);
-              remainingDist.push(returnVector.length());
-              if (returnVector.length() < 0.1) {
-                s.position.copy(o.savedPosition[j]);
-                continue;
-              }
-              returnVector.setLength(SPEED_YACHT * UNIT_PER_FRAME);
-              s.position.sub(returnVector);
-            }
-          }
-          var allReturned = remainingDist.reduce(function(prev, cur) {
-            return prev && cur < 0.01;
-          }, true);
-          if (allReturned) {
-            view_state.orbit = 'guard';
+          o.shipRotation += o.shipRotationRadians * UNIT_PER_FRAME;
+          var shipVector = ship_rotation_vector.clone();
+          shipVector.applyAxisAngle(orbit_rotation_vector, o.orbitRotation);
+          for(var j = 0; j < o.spheres.length; ++j) {
+            var s = o.spheres[j];
+            var rotationOffset = j * Math.PI * 2 / o.spheres.length;
+            // // applyAxisAngle(normalized vector3, angle in radians)
+            s.position.applyAxisAngle(shipVector, o.shipRotationRadians * UNIT_PER_FRAME);
+            o.savedPosition[j].copy(s.position);
           }
         }
+      } else if (view_state.orbit == 'attack') {
+        for(var i = 0; i < orbits.length; ++i) {
+          var o = orbits[i];
+          for(var j = 0; j < o.spheres.length; ++j) {
+            var s = o.spheres[j];
+            var attackVector = s.position.clone();
+            attackVector.sub(corvo.ship.position);
+            attackVector.setLength(SPEED_YACHT * UNIT_PER_FRAME);
+            s.position.sub(attackVector);
+          }
+        }
+      } else {
+        var remainingDist = [];
+        for(var i = 0; i < orbits.length; ++i) {
+          var o = orbits[i];
+          for(var j = 0; j < o.spheres.length; ++j) {
+            var s = o.spheres[j];
+            var returnVector = s.position.clone();
+            returnVector.sub(o.savedPosition[j]);
+            remainingDist.push(returnVector.length());
+            if (returnVector.length() < 0.1) {
+              s.position.copy(o.savedPosition[j]);
+              continue;
+            }
+            returnVector.setLength(SPEED_YACHT * UNIT_PER_FRAME);
+            s.position.sub(returnVector);
+          }
+        }
+        var allReturned = remainingDist.reduce(function(prev, cur) {
+          return prev && cur < 0.01;
+        }, true);
+        if (allReturned) {
+          view_state.orbit = 'guard';
+        }
+      }
     }
     function renderAttack() {
-        corvo.approach.x += view_state.mod_x;
-        corvo.approach.y += view_state.mod_y;
-        corvo.approach.z += view_state.mod_z;
-        corvo.approach.normalize();
-        corvo.rotation += view_state.mod_r;
-        corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
-        corvo.position += corvo.rate * UNIT_PER_FRAME;
-        if (corvo.position > 20) {
-          corvo.position = -20;
-        }
+      //TODO Move the 'controls update' into it's own non-attack function
+      corvo.approach.x += view_state.mod_x;
+      corvo.approach.y += view_state.mod_y;
+      corvo.approach.z += view_state.mod_z;
+      corvo.approach.normalize();
+      corvo.rotation += view_state.mod_r;
+      corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
+      corvo.position += corvo.rate * UNIT_PER_FRAME;
+      if (corvo.position > 20) {
+        corvo.position = -20;
+      }
 
-        var shipVector = new THREE.Vector3(0, corvo.position, 0);
-        shipVector.applyAxisAngle(corvo.approach, corvo.rotation);
-        corvo.ship.position.copy(shipVector);
-        corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
-        corvo.cone.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
+      var shipVector = new THREE.Vector3(0, corvo.position, 0);
+      shipVector.applyAxisAngle(corvo.approach, corvo.rotation);
+      corvo.ship.position.copy(shipVector);
+      corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
+      corvo.cone.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
 
-        var dangerConeVector = new THREE.Vector3(0, -10, 0);
-        dangerConeVector.applyAxisAngle(corvo.approach, corvo.rotation);
-        corvo.cone.matrix.setPosition(dangerConeVector);
+      var dangerConeVector = new THREE.Vector3(0, -10, 0);
+      dangerConeVector.applyAxisAngle(corvo.approach, corvo.rotation);
+      corvo.cone.matrix.setPosition(dangerConeVector);
 
-        corvo.path.matrixAutoUpdate = false;
-        corvo.cone.matrixAutoUpdate = false;
+      corvo.path.matrixAutoUpdate = false;
+      corvo.cone.matrixAutoUpdate = false;
     }
     function prepInitialWorldState() {
       for(var i = 0; i < orbits.length; ++i) {
-            var o = orbits[i];
+        var o = orbits[i];
 
-            o.orbit.matrix.makeRotationAxis(orbit_rotation_vector, o.orbitRotation);
-            o.orbit.matrixAutoUpdate = false;
+        o.orbit.matrix.makeRotationAxis(orbit_rotation_vector, o.orbitRotation);
+        o.orbit.matrixAutoUpdate = false;
 
-            for(var j = 0; j < o.spheres.length; ++j) {
-              var s = o.spheres[j];
-              var rotationOffset = j * Math.PI * 2 / o.spheres.length;
-              var shipVector = new THREE.Vector3(0, o.radius, 0).applyAxisAngle(ship_rotation_vector, o.shipRotation + rotationOffset);  // spin the ships around the ring
-              shipVector.applyAxisAngle(orbit_rotation_vector, o.orbitRotation);  // twist the ring of ships to match the orbit
-              s.position.copy(shipVector);
-            }
+        for(var j = 0; j < o.spheres.length; ++j) {
+          var s = o.spheres[j];
+          var rotationOffset = j * Math.PI * 2 / o.spheres.length;
+          var shipVector = new THREE.Vector3(0, o.radius, 0).applyAxisAngle(ship_rotation_vector, o.shipRotation + rotationOffset);  // spin the ships around the ring
+          shipVector.applyAxisAngle(orbit_rotation_vector, o.orbitRotation);  // twist the ring of ships to match the orbit
+          s.position.copy(shipVector);
         }
+      }
     }
     function render() {
       renderer.render( scene, camera );
