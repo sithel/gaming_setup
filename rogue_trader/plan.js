@@ -188,13 +188,17 @@ function displayPlan() {
     }
     function renderAttack() {
       //TODO Move the 'controls update' into it's own non-attack function
+      if (view_state.time < 1)
+        console.log(corvo.approach);
       corvo.approach.x += view_state.mod_x;
       corvo.approach.y += view_state.mod_y;
       corvo.approach.z += view_state.mod_z;
       corvo.approach.normalize();
       corvo.rotation += view_state.mod_r;
       corvo.path.matrix.makeRotationAxis(corvo.approach, corvo.rotation);
-      corvo.position += corvo.rate * UNIT_PER_FRAME;
+      if (view_state.running) {
+        corvo.position += corvo.rate * UNIT_PER_FRAME;
+      }
       if (corvo.position > 20) {
         corvo.position = -20;
       }
@@ -234,10 +238,13 @@ function displayPlan() {
         prepInitialWorldState();
         view_state.rendered_once = true;
       }
+      renderAttack();
+      document.getElementById('console-approach').innerHTML = "["+numeral(corvo.approach.x).format('0.00') +","+numeral(corvo.approach.y).format('0.00')+","+numeral(corvo.approach.z).format('0.00')+"] &#x2220;"+numeral(corvo.rotation).format('0.00') + "&#x33ad;";
       if (view_state.running) {
         // orbits[0].sphers[0].
-        renderAttack();
         renderOrbits();
+        view_state.time += UNIT_PER_FRAME;
+        document.getElementById('console-time').innerHTML = numeral(view_state.time * 30).format('0.0') + " minutes";
         if (detectHit()) {
           console.log("OH SHIT! HIT!");
           corvo.ship.getObjectByName('zone').material.color.setRGB(1,0,0);
@@ -258,6 +265,7 @@ function displayPlan() {
       mod_y: 0,
       mod_z: 0,
       orbit: 'guard',
+      time: 0,
     }
     window.onkeydown = function(e) {
       var key = e.keyCode ? e.keyCode : e.which;
@@ -308,6 +316,7 @@ function displayPlan() {
       } else if (key == 80) { // p
         view_state.orbit = (view_state.orbit == 'attack') ? 'return' : 'attack';
       } else if (key == 79) { // o
+        view_state.time = 0;
         corvo.position = -20;
         view_state.running = true;
         corvo.ship.getObjectByName('zone').material.color.setRGB(1,1,1);
