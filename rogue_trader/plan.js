@@ -84,8 +84,7 @@ function displayPlan() {
         rate: SPEED_YACHT,
         rotation: 3.929999999999959,
         approachRadius: approachRadius,
-        //TODO This does not seem to actually initialize the approach
-        approach: new THREE.Vector3(0.7481234574677676,-0.04194395817032711,0.6622325850933938),
+        approach: new THREE.Vector3(0.11424393626696773,-0.4289431472264555,0.8960781770993491),
       }
     }
 
